@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的
+例如namespace="me.gacl.mapping.userMapper"就是me.gacl.mapping(包名)+userMapper(userMapper.xml文件去除后缀)
+ -->
+<mapper namespace="shop">
+    
+     <!-- resultMap标签将了工程entity实体类中的对象与数据库中的表对应起来
+         resultMap中的id属性是一个唯一的名字
+         子标签中的id属性用来指定主键
+         result标签用来指定其他的键，其中property属性是指实体中的字段，对应的
+         column属性表示的数据库中的响应的字段
+     -->
+     <resultMap type="com.pro.dong.Shopping.entity.Shop" id="shopMap">
+        <id property="shid" column="shid" jdbcType="VARCHAR"/>
+        <result property="shname" column="shname" jdbcType="VARCHAR"/>
+        <result property="shprice" column="shprice" jdbcType="VARCHAR"/>
+        <result property="shtype" column="shtype" jdbcType="VARCHAR"/>
+        <result property="shbrand" column="shbrand" jdbcType="VARCHAR"/>
+        <result property="shdescribe" column="shdescribe" jdbcType="VARCHAR"/>
+        <result property="cname" column="cname" jdbcType="VARCHAR"/>
+    </resultMap>
+    
+   
+    
+  
+  
+    <!-- 添加 -->
+    <!-- 动态insert -->
+    <!-- 定义两个sql片段，第一个对应字段名,id属性值任意并且唯一 -->
+    <sql id="key">
+      <trim suffixOverrides=",">
+        <if test="shid !=null">
+            shid,
+        </if>
+        <if test="shname !=null">
+            shname,
+        </if>
+        <if test="shprice !=null">
+            shprice,
+        </if>
+        <if test="shtype !=null">
+            shtype,
+        </if>
+        <if test="shbrand !=null">
+            shbrand,
+        </if>
+        <if test="shdescribe !=null">
+            shdescribe,
+        </if>
+        <if test="cname !=null">
+            cname,
+        </if>
+      </trim>
+    </sql>
+    
+    <!-- 定义第二个sql片段，第二个对应?，key属性值任意并且唯一 -->
+    <sql id="value">
+      <trim suffixOverrides=",">
+        <if test="shid !=null">
+            #{shid},
+        </if>
+        <if test="shname !=null">
+            #{shname},
+        </if>
+        <if test="shprice !=null">
+            #{shprice},
+        </if>
+        <if test="shtype !=null">
+            #{shtype},
+        </if>
+          <if test="shbrand !=null">
+            #{shbrand},
+        </if>
+          <if test="shdescribe !=null">
+            #{shdescribe},
+        </if>
+         <if test="cname !=null">
+            #{cname},
+        </if>
+      </trim>
+    </sql>
+    <insert id="insert" parameterType="com.pro.dong.Shopping.entity.Shop">
+        <selectKey keyProperty="shid" order="BEFORE" resultType="java.lang.String">
+       select emp_sequence.NEXTVAL  from DUAL
+        </selectKey>
+         insert into shopping (<include refid="key"/>)
+             values (<include refid="value"/>)
+    </insert>
+    
+    <!-- 查询 -->
+    <select id="all" resultMap="shopMap">
+        select * from shopping 
+    </select>
+    
+    <!-- 删除 -->
+     <delete id="delete" parameterType="String">
+        delete from shopping where shid=#{shid}
+    </delete>
+    
+    <!-- 通过id查询 -->
+     <select id="getOne" parameterType="String" resultMap="shopMap">
+        select * from shopping where shid = #{shid}
+    </select>
+    
+    <!-- 修改 -->
+     <update id="update" parameterType="com.pro.dong.Shopping.entity.Shop">
+        update shopping  
+        <set>
+              <if test="shname != null">
+              				shname=#{shname},
+               </if>
+               <if test="shprice != null">
+               				shprice=#{shprice},
+               </if>
+               <if test="shtype != null">
+              				shtype=#{shtype},
+               </if>
+                <if test="shbrand != null">
+              				shbrand=#{shbrand},
+               </if>
+                <if test="shdescribe != null">
+              				shdescribe=#{shdescribe}
+               </if>
+        </set>
+          where shid=#{shid}
+    </update>
+ 
+    <!-- 通过name查询 -->  
+<select id="nameall" parameterType="String" resultMap="shopMap">  
+   select * from shopping where cname= #{cname}
+</select>  
+   
+   <!-- 根据分页数据start 和size查询数据 -->
+    <select id="findByPage" parameterType="Map" resultMap="shopMap">
+     SELECT * FROM   
+                   (  
+                             SELECT A.*, ROWNUM RN   
+                             FROM (SELECT * FROM shopping) A   
+                  )  
+                  WHERE RN BETWEEN #{start} AND #{size}  
+    </select>
+    <!-- 查询商品记录总数 -->
+    <select id="selectCount" resultType="int">
+select count(*) from (select count(*) from shopping group by shid ) shopping
+    </select>
+   
+    <!-- 清空改用购物车删除 -->
+     <delete id="alldelete" parameterType="String">
+        delete from shopping where cname=#{cname}
+    </delete>
+   
+</mapper>
