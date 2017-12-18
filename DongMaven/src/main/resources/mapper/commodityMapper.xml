@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的
+例如namespace="me.gacl.mapping.userMapper"就是me.gacl.mapping(包名)+userMapper(userMapper.xml文件去除后缀)
+ -->
+<mapper namespace="com">
+    
+     <!-- resultMap标签将了工程entity实体类中的对象与数据库中的表对应起来
+         resultMap中的id属性是一个唯一的名字
+         子标签中的id属性用来指定主键
+         result标签用来指定其他的键，其中property属性是指实体中的字段，对应的
+         column属性表示的数据库中的响应的字段
+     -->
+     <resultMap type="com.pro.dong.commodity.entity.Commodity" id="commMap">
+        <id property="cid" column="cid" jdbcType="VARCHAR"/>
+        <result property="cname" column="cname" jdbcType="VARCHAR"/>
+        <result property="cprice" column="cprice" jdbcType="VARCHAR"/>
+        <result property="fid" column="fid" jdbcType="VARCHAR"/>
+        <result property="ctype" column="ctype" jdbcType="VARCHAR"/>
+        <result property="cbrand" column="cbrand" jdbcType="VARCHAR"/>
+        <result property="describe" column="describe" jdbcType="VARCHAR"/>
+    </resultMap>
+    
+   
+    
+  
+  
+    <!-- 添加 -->
+    <!-- 动态insert -->
+    <!-- 定义两个sql片段，第一个对应字段名,id属性值任意并且唯一 -->
+    <sql id="key">
+      <trim suffixOverrides=",">
+        <if test="cid !=null">
+            cid,
+        </if>
+        <if test="cname !=null">
+            cname,
+        </if>
+        <if test="cprice !=null">
+            cprice,
+        </if>
+        <if test="fid !=null">
+            fid,
+        </if>
+        <if test="ctype!=null">
+            ctype,
+        </if>
+        <if test="cbrand!=null">
+            cbrand,
+        </if>
+        <if test="describe!=null">
+            describe,
+        </if>
+      </trim>
+    </sql>
+    
+    <!-- 定义第二个sql片段，第二个对应?，key属性值任意并且唯一 -->
+    <sql id="value">
+      <trim suffixOverrides=",">
+        <if test="cid !=null">
+            #{cid},
+        </if>
+        <if test="cname !=null">
+            #{cname},
+        </if>
+        <if test="cprice !=null">
+            #{cprice},
+        </if>
+        <if test="fid !=null">
+            #{fid},
+        </if>
+        <if test="ctype !=null">
+            #{ctype},
+        </if>
+        <if test="cbrand !=null">
+            #{cbrand},
+        </if>
+        <if test="describe !=null">
+            #{describe},
+        </if>
+      </trim>
+    </sql>
+    <insert id="insertComm" parameterType="com.pro.dong.commodity.entity.Commodity">
+        <selectKey keyProperty="cid" order="BEFORE" resultType="java.lang.String">
+       select emp_sequence.NEXTVAL  from DUAL
+        </selectKey>
+         insert into commodity (<include refid="key"/>)
+             values (<include refid="value"/>)
+    </insert>
+    
+    <!-- 查询 -->
+    <select id="commList" resultMap="commMap">
+        select * from commodity 
+    </select>
+    
+    <!-- 删除 -->
+     <delete id="deleteComm" parameterType="String">
+        delete from commodity where cid=#{cid}
+    </delete>
+    
+    <!-- 通过id查询 -->
+     <select id="getOne" parameterType="String" resultMap="commMap">
+        select * from commodity where cid = #{cid}
+    </select>
+    
+    <!-- 修改 -->
+     <update id="updateComm" parameterType="com.pro.dong.commodity.entity.Commodity">
+        update commodity  
+        <set>
+              <if test="cname != null">
+              				cname=#{cname},
+               </if>
+               <if test="cprice != null">
+               				cprice=#{cprice},
+               </if>
+               <if test="fid != null">
+              				fid=#{fid},
+               </if>
+               <if test="ctype != null">
+               				ctype=#{ctype},
+               </if>
+               <if test="cbrand != null">
+              				cbrand=#{cbrand},
+               </if>
+               <if test="describe != null">
+               				describe=#{describe}
+               </if>
+        </set>
+          where cid=#{cid}
+    </update>
+  <sql id="Base_Column_List">
+        cid, cname, cprice, fid, ctype, cbrand,describe
+    </sql>
+   <!-- 根据分页数据start 和size查询数据 -->
+    <select id="findByPage" parameterType="Map" resultMap="commMap">
+     SELECT * FROM   
+                   (  
+                             SELECT A.*, ROWNUM RN   
+                             FROM (SELECT * FROM commodity) A   
+                  )  
+                  WHERE RN BETWEEN #{start} AND #{size}  
+    </select>
+    <!-- 查询商品记录总数 -->
+    <select id="selectCount" resultType="int">
+select count(*) from (select count(*) from commodity group by cid ) commodity
+    </select>
+</mapper>
