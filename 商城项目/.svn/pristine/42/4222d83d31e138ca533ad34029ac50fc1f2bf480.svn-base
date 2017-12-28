@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+   <!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>	
+	<constant name="struts.enable.DynamicMethodInvocation" value="true" />
+	<constant name="struts.devMode" value="true" />
+	<constant name="struts.multipart.maxSize" value="209715200"/>
+	<!-- 拦截器 -->
+	<include file="struts_global.xml"></include>
+	<!-- 登录 -->
+	<include file="struts_login.xml"></include>
+	<!-- 商品 -->
+	<include file="struts_commodity.xml"></include>
+	<!-- 商品订单 -->
+	<include file="struts_commOrder.xml"></include>
+	<!-- 维修订单 -->
+	<include file="struts_RepairOrder.xml"></include>
+	<!-- 菜单 -->
+	<include file="struts_menu.xml"></include>
+	<!-- 客户表 -->
+	<include file="struts_Custumer.xml"></include>
+	<!-- 角色表 -->
+	<include file="struts_Role.xml"></include>
+</struts>

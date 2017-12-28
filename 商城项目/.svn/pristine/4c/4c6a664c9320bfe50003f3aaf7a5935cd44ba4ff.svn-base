@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的
+例如namespace="me.gacl.mapping.userMapper"就是me.gacl.mapping(包名)+userMapper(userMapper.xml文件去除后缀)
+ -->
+<mapper namespace="Rep">
+    
+     <!-- resultMap标签将了工程entity实体类中的对象与数据库中的表对应起来
+         resultMap中的id属性是一个唯一的名字
+         子标签中的id属性用来指定主键
+         result标签用来指定其他的键，其中property属性是指实体中的字段，对应的
+         column属性表示的数据库中的响应的字段
+     -->
+     <resultMap type="com.pro.dong.repairOrder.entity.RepairOrder" id="repMap">
+        <id property="reid" column="reid" jdbcType="VARCHAR"/>
+        <result property="rtype" column="rtype" jdbcType="VARCHAR"/>
+        <result property="rbrand" column="rbrand" jdbcType="VARCHAR"/>
+        <result property="fault" column="fault" jdbcType="VARCHAR"/>
+        <result property="remarks" column="remarks" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="VARCHAR"/>
+        <result property="cname" column="cname" jdbcType="VARCHAR"/>
+        <result property="cphone" column="cphone" jdbcType="VARCHAR"/>
+    </resultMap>
+    
+   
+    
+  
+  
+    <!-- 添加 -->
+    <!-- 动态insert -->
+    <!-- 定义两个sql片段，第一个对应字段名,id属性值任意并且唯一 -->
+    <sql id="key">
+      <trim suffixOverrides=",">
+        <if test="reid !=null">
+            reid,
+        </if>
+        <if test="rtype !=null">
+            rtype,
+        </if>
+        <if test="rbrand !=null">
+            rbrand,
+        </if>
+        <if test="fault !=null">
+            fault,
+        </if>
+        <if test="remarks !=null">
+            remarks,
+        </if>
+        <if test="status !=null">
+            status,
+        </if>
+        <if test="cname !=null">
+            cname,
+        </if>
+          <if test="cphone !=null">
+            cphone,
+        </if>
+      </trim>
+    </sql>
+    
+    <!-- 定义第二个sql片段，第二个对应?，key属性值任意并且唯一 -->
+    <sql id="value">
+      <trim suffixOverrides=",">
+        <if test="reid !=null">
+            #{reid},
+        </if>
+        <if test="rtype !=null">
+            #{rtype},
+        </if>
+        <if test="rbrand !=null">
+            #{rbrand},
+        </if>
+        <if test="fault !=null">
+            #{fault},
+        </if>
+        <if test="remarks !=null">
+            #{remarks},
+        </if>
+        <if test="status !=null">
+            #{status},
+        </if>
+        <if test="cname !=null">
+            #{cname},
+        </if>
+         <if test="cphone !=null">
+            #{cphone},
+        </if>
+      </trim>
+    </sql>
+    <insert id="insert" parameterType="com.pro.dong.repairOrder.entity.RepairOrder">
+        <selectKey keyProperty="reid" order="BEFORE" resultType="java.lang.String">
+       select emp_sequence.NEXTVAL  from DUAL
+        </selectKey>
+         insert into RepairOrder (<include refid="key"/>)
+             values (<include refid="value"/>)
+    </insert>
+    
+    <!-- 查询 -->
+    <select id="all" resultMap="repMap">
+        select * from RepairOrder 
+    </select>
+    
+    <!-- 删除 -->
+     <delete id="delete" parameterType="String">
+        delete from RepairOrder where reid=#{reid}
+    </delete>
+    
+    <!-- 通过id查询 -->
+     <select id="getOne" parameterType="String" resultMap="repMap">
+        select * from RepairOrder where reid = #{reid}
+    </select>
+    
+    <!-- 修改 -->
+     <update id="update" parameterType="com.pro.dong.repairOrder.entity.RepairOrder">
+        update RepairOrder  
+        <set>
+              <if test="rtype  != null">
+              				rtype =#{rtype },
+               </if>
+               <if test="rbrand  != null">
+               				rbrand =#{rbrand },
+               </if>
+               <if test="fault  != null">
+              				fault =#{fault },
+               </if>
+               <if test="remarks  != null">
+               				remarks =#{remarks },
+               </if>
+               <if test="status  != null">
+              				status =#{status },
+               </if>
+               <if test="cname != null">
+               				cname=#{cname},
+               </if>
+               <if test="cphone   != null">
+               				cphone  =#{cphone  }
+               </if>
+        </set>
+          where reid=#{reid}
+    </update>
+ <!-- 根据分页数据start 和size查询数据 -->
+    <select id="findByPage" parameterType="Map" resultType="Map">
+     SELECT * FROM   
+                   (  
+                             SELECT A.*, ROWNUM RN   
+                             FROM (SELECT * FROM RepairOrder u join  T_CUSTUMER ur on ur.cname =u.cname) A   
+                  )  
+                  WHERE RN BETWEEN #{start} AND #{size}  
+    </select>
+    <!-- 查询商品记录总数 -->
+    <select id="selectCount" resultType="int">
+select count(*) from (select count(*) from (SELECT * FROM RepairOrder u join  T_CUSTUMER ur on ur.cname =u.cname) group by reid ) RepairOrder
+    </select>
+    
+    <!-- 通过name查询 -->  
+<select id="nameall" parameterType="String" resultMap="repMap">  
+   select * from RepairOrder where cname= #{cname}
+</select>  
+</mapper>
